@@ -19,7 +19,7 @@ import rx.Subscriber;
 import rx.Subscription;
 import rx.android.schedulers.AndroidSchedulers;
 import rx.schedulers.Schedulers;
-import site.chniccs.basefrm.listener.IOnDialogClickListener;
+import site.chniccs.basefrm.listener.IOnUpdateDialogClickListener;
 import site.chniccs.basefrm.widget.UpdateDialog;
 
 /**
@@ -68,7 +68,7 @@ public class UpDateUtils {
     }
 
     private void showNoticeDialog(boolean force) {
-        mUpdateDialog = new UpdateDialog(mActivity, new IOnDialogClickListener() {
+        mUpdateDialog = new UpdateDialog(mActivity, new IOnUpdateDialogClickListener() {
             @Override
             public void onAgree() {
                 downloadAPK();

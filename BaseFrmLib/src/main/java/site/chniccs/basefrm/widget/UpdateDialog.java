@@ -8,7 +8,7 @@ import android.widget.LinearLayout;
 import android.widget.TextView;
 
 import site.chniccs.basefrm.R;
-import site.chniccs.basefrm.listener.IOnDialogClickListener;
+import site.chniccs.basefrm.listener.IOnUpdateDialogClickListener;
 import site.chniccs.basefrm.widget.base.BaseDialog;
 
 /**
@@ -16,13 +16,13 @@ import site.chniccs.basefrm.widget.base.BaseDialog;
  */
 
 public class UpdateDialog extends BaseDialog {
-    private IOnDialogClickListener mListener;
+    private IOnUpdateDialogClickListener mListener;
     private LinearLayout mBtnContainer;
     private LinearLayout mBtnProgressContainer;
     private LinearLayout mBtnInstallContainer;
     private ProgressButton mBtnProgress;
 
-    public UpdateDialog(Activity context, IOnDialogClickListener listener) {
+    public UpdateDialog(Activity context, IOnUpdateDialogClickListener listener) {
         super(context);
         mListener = listener;
     }
