@@ -7,13 +7,12 @@ import android.os.Bundle;
  * 懒加载fragment
  */
 
-public abstract class BaseLazyFragment<T extends IBasePresenter> extends BaseFragment {
+public abstract class BaseLazyFragment<T extends IBasePresenter> extends BaseFragment<T> {
     private boolean isPrepared;
-    protected T mLPresenter;
 
     @Override
     protected void setPresenter(IBasePresenter presenter) {
-        mLPresenter= (T) mPresenter;
+//        mLPresenter= (T) mPresenter;
     }
     @Override
     public void onActivityCreated(Bundle savedInstanceState) {

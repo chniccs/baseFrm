@@ -9,6 +9,9 @@ import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
 
+import java.lang.reflect.Constructor;
+import java.lang.reflect.InvocationTargetException;
+
 import butterknife.ButterKnife;
 import site.chniccs.basefrm.widget.LoadingDialog;
 
@@ -18,8 +21,9 @@ import site.chniccs.basefrm.widget.LoadingDialog;
  */
 
 public abstract class BaseFragment<T extends IBasePresenter> extends Fragment implements IBaseView {
-    protected T mPresenter;
+    public T mPresenter;
     private LoadingDialog mDialog;
+
     @Override
     public void onCreate(@Nullable Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
@@ -29,19 +33,22 @@ public abstract class BaseFragment<T extends IBasePresenter> extends Fragment im
     @Override
     public View onCreateView(LayoutInflater inflater, @Nullable ViewGroup container, @Nullable Bundle savedInstanceState) {
         View view = inflater.inflate(getLayout(), null);
-        ButterKnife.bind(this,view);
-        mPresenter= (T) getPresenter();
+        ButterKnife.bind(this, view);
+        mPresenter = createPresenter();
         setPresenter(mPresenter);
         mPresenter.subscribe();
         initView();
         init();
         return view;
     }
-    protected void setPresenter(T presenter){
+
+    protected void setPresenter(T presenter) {
     }
 
     protected abstract void initView();
-    protected void  init(){};
+
+    protected void init() {
+    }
 
     @Override
     public void onDestroy() {
@@ -54,15 +61,34 @@ public abstract class BaseFragment<T extends IBasePresenter> extends Fragment im
                 }
                 mDialog = null;
             }
-        }catch (Exception e){
+        } catch (Exception e) {
             e.printStackTrace();
         }
 
     }
-    protected abstract @LayoutRes
+
+    private T createPresenter() {
+        T presenterInstance = null;
+        try {
+            Class<T> presenter = getPresenter();
+            Constructor c = presenter.getDeclaredConstructor(new Class[]{IBaseView.class});
+            c.setAccessible(true);
+            presenterInstance = (T) c.newInstance(new Object[]{this});
+        } catch (NoSuchMethodException | InvocationTargetException | java.lang.InstantiationException | IllegalAccessException e) {
+            e.printStackTrace();
+        }
+        if (presenterInstance == null) {
+            throw new RuntimeException("请确认是否已经正确的创建了Presenter类,Presenter必须继承自当前页面的Contract中的内部类Presenter");
+        }
+        return presenterInstance;
+    }
+
+    protected abstract
+    @LayoutRes
     int getLayout();
-    protected abstract @NonNull
-    IBasePresenter getPresenter();
+
+    protected abstract Class<T> getPresenter();
+
     @Override
     public void shodLoading() {
         showDialog();

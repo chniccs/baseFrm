@@ -18,12 +18,10 @@ import site.chniccs.basefrm.listener.ISelectPhotoWayInterface;
  * 图片选择的activity基类
  */
 
-public abstract class BaseTakePhotoActivity<T extends IBasePresenter> extends BaseActivity implements TakePhoto.TakeResultListener, InvokeListener, ISelectPhotoWayInterface {
+public abstract class BaseTakePhotoActivity<T extends IBasePresenter> extends BaseActivity<T> implements TakePhoto.TakeResultListener, InvokeListener, ISelectPhotoWayInterface {
 
-    private static final String TAG = BaseTakePhotoActivity.class.getName();
     private TakePhoto takePhoto;
     private InvokeParam invokeParam;
-    protected T mTPresenter;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -33,7 +31,7 @@ public abstract class BaseTakePhotoActivity<T extends IBasePresenter> extends Ba
 
     @Override
     protected void setPresenter(IBasePresenter presenter) {
-        mTPresenter= (T) mPresenter;
+//        mTPresenter= (T) mPresenter;
     }
 
     @Override
@@ -66,21 +64,6 @@ public abstract class BaseTakePhotoActivity<T extends IBasePresenter> extends Ba
         }
         return takePhoto;
     }
-
-//    @Override
-//    public void takeSuccess(TResult result) {
-//        Log.i(TAG, "takeSuccess：" + result.getImage().getPath());
-//    }
-
-//    @Override
-//    public void takeFail(TResult result, String msg) {
-//        Log.i(TAG, "takeFail:" + msg);
-//    }
-//
-//    @Override
-//    public void takeCancel() {
-//        Log.i(TAG, getResources().getString(R.string.msg_operation_canceled));
-//    }
 
     @Override
     public PermissionManager.TPermissionType invoke(InvokeParam invokeParam) {

@@ -3,15 +3,13 @@ package site.chniccs.basefrm.base;
 import android.os.Bundle;
 import android.support.annotation.ColorInt;
 import android.support.annotation.LayoutRes;
-import android.support.annotation.NonNull;
 import android.support.annotation.Nullable;
 import android.support.v7.app.AppCompatActivity;
 import android.view.ViewGroup;
-
 import com.jaeger.library.StatusBarUtil;
-
 import org.greenrobot.eventbus.EventBus;
-
+import java.lang.reflect.Constructor;
+import java.lang.reflect.InvocationTargetException;
 import butterknife.ButterKnife;
 import site.chniccs.basefrm.R;
 import site.chniccs.basefrm.widget.LoadingDialog;
@@ -22,7 +20,7 @@ import site.chniccs.basefrm.widget.LoadingDialog;
  */
 
 public abstract class BaseActivity<T extends IBasePresenter> extends AppCompatActivity implements IBaseView {
-    protected T mPresenter;
+    public T mPresenter;
     private LoadingDialog mDialog;
 
     @Override
@@ -34,7 +32,7 @@ public abstract class BaseActivity<T extends IBasePresenter> extends AppCompatAc
         if (needEventBus()) {
             EventBus.getDefault().register(this);
         }
-        mPresenter = (T) getPresenter();
+        mPresenter =  createPresenter();
         setPresenter(mPresenter);
         initView();
         init();
@@ -59,8 +57,7 @@ public abstract class BaseActivity<T extends IBasePresenter> extends AppCompatAc
     protected
     @ColorInt
     int getStatusBarColor() {
-        int color = getResources().getColor(R.color.colorPrimary);
-        return color;
+        return getResources().getColor(R.color.colorPrimary);
     }
 
     protected boolean needEventBus() {
@@ -93,15 +90,29 @@ public abstract class BaseActivity<T extends IBasePresenter> extends AppCompatAc
         }
 
     }
+    private T createPresenter() {
 
+        T presenterInstance = null;
+        try {
+            Class<T> presenter = (Class<T>) getPresenter();
+            Constructor c = presenter.getDeclaredConstructor(new Class[]{IBaseView.class});
+            c.setAccessible(true);
+            presenterInstance = (T) c.newInstance(new Object[]{this});
+        } catch (NoSuchMethodException | InvocationTargetException | java.lang.InstantiationException | IllegalAccessException e) {
+            e.printStackTrace();
+        }
+        if (presenterInstance == null) {
+            throw new RuntimeException("请确定已经正确的创建了Presenter类,Presenter必须继承自当前页面的Contract中的内部类Presenter");
+        }
+        return presenterInstance;
+    }
     //    获取布局
     protected abstract
     @LayoutRes
     int getLayout();
 
     protected abstract
-    @NonNull
-    IBasePresenter getPresenter();
+    Class<?> getPresenter();
 
     @Override
     public void shodLoading() {
