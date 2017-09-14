@@ -1,6 +1,5 @@
 package site.chniccs.basefrm.utils;
 
-
 import android.app.Activity;
 import android.content.Intent;
 import android.net.Uri;
@@ -9,29 +8,27 @@ import android.os.Environment;
 import android.os.Handler;
 import android.os.Message;
 import android.support.v4.content.FileProvider;
-
+import android.text.TextUtils;
 import java.io.File;
 import java.io.IOException;
 import java.lang.ref.WeakReference;
-
 import rx.Observable;
 import rx.Subscriber;
 import rx.Subscription;
-import rx.android.schedulers.AndroidSchedulers;
 import rx.schedulers.Schedulers;
 import site.chniccs.basefrm.listener.IOnUpdateDialogClickListener;
+import site.chniccs.basefrm.widget.MyUpdateDialog;
 import site.chniccs.basefrm.widget.UpdateDialog;
 
 /**
  * 更新工具类
  */
 
-public class UpDateUtils {
+public class UpDateUtils implements IOnUpdateDialogClickListener {
     private Activity mActivity;
     private String mAppid;
     private static final String apkUrl = "http://olcuw5kr7.bkt.clouddn.com/app-release.apk"; //apk下载地址
-    private static final String savePath = getSavaPth(); //apk保存到SD卡的路径
-    private static final String saveFileName = savePath + System.currentTimeMillis() + "update.apk"; //完整路径名
+    private static String savePath; //apk保存到SD卡的路径
 
     private String serverVersion = ""; //从服务器获取的版本号
     private String clientVersion; //客户端当前的版本号
@@ -39,60 +36,83 @@ public class UpDateUtils {
     private boolean forceUpdate = true; //是否强制更新
     private UpdateDialog mUpdateDialog;
     public static final int UPDATE = 1001;
-    public static final int DONE = 1002;
+    public static final int FAILED = 1002;
+    public static final int DONE = 1003;
     private UpdateHandler mHandler;
     private Subscription mSubscription;
+    private float mProgress = 0;
 
 
     /**
      * 构造函数
+     *
      * @param activity 引用
-     * @param appid 传入APPLICATION_ID
+     * @param appid    传入APPLICATION_ID
+     * @param dir      自定义下载目录,不传入默认是当前应用的包名
      */
-    public UpDateUtils(Activity activity, String appid) {
+    public UpDateUtils(Activity activity, String appid, String dir) {
         mActivity = activity;
         mAppid = appid;
+        savePath = getSavaPth(dir);
     }
 
-    private static String getSavaPth() {
+    /**
+     * 构造函数
+     *
+     * @param activity 引用
+     * @param appid    传入APPLICATION_ID
+     */
+    public UpDateUtils(Activity activity, String appid) {
+        this(activity, appid, null);
+    }
+
+    private String getSavaPth(String dirName) {
+        if (TextUtils.isEmpty(dirName)) {
+            dirName = "/" + mActivity.getPackageName() + "/";
+        }
         if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.N) {
-            return Environment.getExternalStorageDirectory().getPath() + "/dangjian/";
+            return Environment.getExternalStorageDirectory().getPath() + dirName;
         } else {
-            return Environment.getExternalStorageDirectory().getPath() + "/dangjian/";
+            return Environment.getExternalStorageDirectory().getPath() + dirName;
         }
     }
 
+    //自定义设置dialog的方法
+    public void setDialog(UpdateDialog updateDialog) {
+        mUpdateDialog = updateDialog;
+    }
 
     public void updata() {
         showNoticeDialog(false);
     }
 
+    /*--------dialog回调 start----*/
+    @Override
+    public void onAgree() {
+        downloadAPK();
+    }
+
+    @Override
+    public void onDisagree() {
+    }
+
+    @Override
+    public void toInstall() {
+        installAPK(mActivity);
+    }
+
+    /*--------dialog回调 end----*/
     private void showNoticeDialog(boolean force) {
-        mUpdateDialog = new UpdateDialog(mActivity, new IOnUpdateDialogClickListener() {
-            @Override
-            public void onAgree() {
-                downloadAPK();
-            }
-
-            @Override
-            public void onDisagree() {
-
-            }
-
-            @Override
-            public void toInstall() {
-                installAPK(mActivity);
-            }
-        });
+        if (mUpdateDialog == null) {
+            mUpdateDialog = new MyUpdateDialog(mActivity);
+        }
+        mUpdateDialog.setIOnUpdateDialogClickListener(this);
         mUpdateDialog.setCancelable(false);
         mUpdateDialog.setCanceledOnTouchOutside(false);
         mUpdateDialog.show();
-
         mHandler = new UpdateHandler(mUpdateDialog);
     }
 
-
-    float progress = 0;
 
     /**
      * 下载apk的线程
@@ -100,7 +120,6 @@ public class UpDateUtils {
     private void downloadAPK() {
 
         mSubscription = downloadFile(apkUrl, savePath, new Subscriber<FileInfo>() {
-
             @Override
             public void onCompleted() {
                 LogUtil.d(Thread.currentThread().getName() + "onCompleted ");
@@ -114,35 +133,22 @@ public class UpDateUtils {
             public void onError(Throwable e) {
                 e.printStackTrace();
                 LogUtil.e(e.getMessage());
+                Message message = mHandler.obtainMessage();
+                message.what = FAILED;
+                mHandler.sendMessage(message);
+
             }
 
             @Override
             public void onNext(FileInfo fileInfo) {
-                progress = (((float) fileInfo.getCurrentSize()) / ((float) fileInfo.getFileSize()));
-                int percent = (int) (progress * 100);
+                mProgress = (((float) fileInfo.getCurrentSize()) / ((float) fileInfo.getFileSize()));
+                int percent = (int) (mProgress * 100);
                 Message message = mHandler.obtainMessage();
                 message.what = UPDATE;
                 message.obj = percent;
                 mHandler.sendMessage(message);
             }
         });
-
-    }
-
-    public static final Observable.Transformer schedulersTransformer =
-            new Observable.Transformer<Observable, Observable>() {
-                @Override
-                public Observable<Observable> call(Observable<Observable> observable) {
-                    return observable.subscribeOn(Schedulers.io()).observeOn(AndroidSchedulers.mainThread());
-                }
-            };
-
-    /**
-     * 应用 Schedulers .方便 compose() 简化代码
-     */
-    @SuppressWarnings("unchecked")
-    public static <T> Observable.Transformer<T, T> applySchedulers() {
-        return (Observable.Transformer<T, T>) schedulersTransformer;
     }
 
     private Subscription downloadFile(final String url, final String dest, Subscriber<FileInfo> subscriber) {
@@ -197,6 +203,7 @@ public class UpDateUtils {
 
         @Override
         public String getMessageName(Message message) {
+
             switch (message.what) {
                 case UPDATE:
                     if (mUpdateDialogWeakReference != null) {
@@ -210,7 +217,16 @@ public class UpDateUtils {
                 case DONE:
                     if (mUpdateDialogWeakReference != null) {
                         try {
-                            mUpdateDialogWeakReference.get().setInstallContainerShow();
+                            mUpdateDialogWeakReference.get().downloadSuccess();
+                        } catch (Exception e) {
+                            e.printStackTrace();
+                        }
+                    }
+                    break;
+                case FAILED:
+                    if (mUpdateDialogWeakReference != null) {
+                        try {
+                            mUpdateDialogWeakReference.get().downloadFailed();
                         } catch (Exception e) {
                             e.printStackTrace();
                         }
@@ -221,6 +237,9 @@ public class UpDateUtils {
         }
     }
 
+    /**
+     * 在activity中最好主动调用
+     */
     public void onDestory() {
         mActivity = null;
         if (mUpdateDialog != null) {
