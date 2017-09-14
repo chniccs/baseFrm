@@ -47,7 +47,6 @@ public abstract class BaseTakePhotoActivity<T extends IBasePresenter> extends Ba
         PermissionManager.TPermissionType type = PermissionManager.onRequestPermissionsResult(requestCode, permissions, grantResults);
         PermissionManager.handlePermissionsResult(this, type, invokeParam, this);
     }
-
     /**
      * 获取TakePhoto实例
      *

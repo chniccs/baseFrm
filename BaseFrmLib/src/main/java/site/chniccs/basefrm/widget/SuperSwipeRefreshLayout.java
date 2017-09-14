@@ -44,7 +44,8 @@ import site.chniccs.basefrm.listener.ILoadMoreViewListener;
  */
 public class SuperSwipeRefreshLayout extends ViewGroup {
     private static final String LOG_TAG = "CustomeSwipeRefreshLayout";
-    private static final int HEADER_VIEW_HEIGHT = 80;// HeaderView height (dp)
+    private static int HEADER_VIEW_HEIGHT = 80;// HeaderView height (dp)
+    private static int FOOTER_VIEW_HEIGHT = 80;// HeaderView height (dp)
 
     private static final float DECELERATE_INTERPOLATION_FACTOR = 2f;
     private static final int INVALID_POINTER = -1;
@@ -246,6 +247,9 @@ public class SuperSwipeRefreshLayout extends ViewGroup {
                 .obtainStyledAttributes(attrs, LAYOUT_ATTRS);
         setEnabled(a.getBoolean(0, true));
         a.recycle();
+        //自定义属性，设置footerView的高度，单位是dp
+        TypedArray ta = context.obtainStyledAttributes(attrs, R.styleable.SuperSwipeRefreshLayout);
+        FOOTER_VIEW_HEIGHT = ta.getInt(R.styleable.SuperSwipeRefreshLayout_footerheight, FOOTER_VIEW_HEIGHT);
 
         WindowManager wm = (WindowManager) context
                 .getSystemService(Context.WINDOW_SERVICE);
@@ -255,7 +259,7 @@ public class SuperSwipeRefreshLayout extends ViewGroup {
         mHeaderViewWidth = (int) display.getWidth();
         mFooterViewWidth = (int) display.getWidth();
         mHeaderViewHeight = (int) (HEADER_VIEW_HEIGHT * metrics.density);
-        mFooterViewHeight = (int) (HEADER_VIEW_HEIGHT * metrics.density);
+        mFooterViewHeight = (int) (FOOTER_VIEW_HEIGHT * metrics.density);
         defaultProgressView = new CircleProgressView(getContext());
         createHeaderViewContainer();
         createFooterViewContainer();
