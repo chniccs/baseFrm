@@ -11,10 +11,6 @@ public abstract class BaseLazyFragment<T extends IBasePresenter> extends BaseFra
     private boolean isPrepared;
 
     @Override
-    protected void setPresenter(IBasePresenter presenter) {
-//        mLPresenter= (T) mPresenter;
-    }
-    @Override
     public void onActivityCreated(Bundle savedInstanceState) {
         super.onActivityCreated(savedInstanceState);
         initPrepare();

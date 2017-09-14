@@ -30,11 +30,6 @@ public abstract class BaseTakePhotoActivity<T extends IBasePresenter> extends Ba
     }
 
     @Override
-    protected void setPresenter(IBasePresenter presenter) {
-//        mTPresenter= (T) mPresenter;
-    }
-
-    @Override
     protected void onSaveInstanceState(Bundle outState) {
         getTakePhoto().onSaveInstanceState(outState);
         super.onSaveInstanceState(outState);

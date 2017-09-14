@@ -35,6 +35,7 @@ import android.widget.ScrollView;
 import android.widget.TextView;
 
 import site.chniccs.basefrm.R;
+import site.chniccs.basefrm.listener.ILoadMoreViewListener;
 
 
 /**
@@ -53,6 +54,7 @@ public class SuperSwipeRefreshLayout extends ViewGroup {
     private static final int ANIMATE_TO_TRIGGER_DURATION = 200;
     private static final int ANIMATE_TO_START_DURATION = 200;
     private static final int DEFAULT_CIRCLE_TARGET = 64;
+
 
     // SuperSwipeRefreshLayout内的目标View，比如RecyclerView,ListView,ScrollView,GridView
     // etc.
@@ -123,6 +125,7 @@ public class SuperSwipeRefreshLayout extends ViewGroup {
 
     private boolean isProgressEnable = true;
 
+    private ILoadMoreViewListener mFooterViewListener;//footerView 的监听器
     /**
      * 下拉时，超过距离之后，弹回来的动画监听器
      */
@@ -202,6 +205,14 @@ public class SuperSwipeRefreshLayout extends ViewGroup {
         if (child == null) {
             return;
         }
+        try {
+            if (child instanceof ILoadMoreViewListener) {
+                mFooterViewListener = (ILoadMoreViewListener) child;
+            }
+        } catch (Exception e) {
+            e.printStackTrace();
+        }
+
         if (mFooterViewContainer == null) {
             return;
         }
@@ -308,13 +319,13 @@ public class SuperSwipeRefreshLayout extends ViewGroup {
      */
     private void createFooterViewContainer() {
         mFooterViewContainer = new RelativeLayout(getContext());
-        TextView textView=new TextView(getContext());
+        TextView textView = new TextView(getContext());
         RelativeLayout.LayoutParams layoutParams = new RelativeLayout.LayoutParams(LayoutParams.MATCH_PARENT, LayoutParams.WRAP_CONTENT);
         textView.setLayoutParams(layoutParams);
         textView.setText("加载更多...");
         DisplayMetrics metrics = getResources().getDisplayMetrics();
         textView.setTextColor(Color.parseColor("#999999"));
-        textView.setTextSize((int)(10*metrics.density));
+        textView.setTextSize((int) (10 * metrics.density));
         textView.setGravity(Gravity.CENTER);
         mFooterViewContainer.addView(textView);
         mFooterViewContainer.setVisibility(View.GONE);
@@ -719,6 +730,7 @@ public class SuperSwipeRefreshLayout extends ViewGroup {
 
     /**
      * 解决与viewpager等水平滑动控件的冲突
+     *
      * @param disableWhenHorizontalMove 是否解决
      */
     public void disableWhenHorizontalMove(boolean disableWhenHorizontalMove) {
@@ -950,6 +962,9 @@ public class SuperSwipeRefreshLayout extends ViewGroup {
                     if (mOnPushLoadMoreListener != null) {
                         mOnPushLoadMoreListener
                                 .onPushEnable(pushDistance >= mFooterViewHeight);
+                        if (mFooterViewListener != null) {
+                            mFooterViewListener.onPushEnable(pushDistance >= mFooterViewHeight);
+                        }
                     }
                 }
                 break;
@@ -991,6 +1006,9 @@ public class SuperSwipeRefreshLayout extends ViewGroup {
                             && mOnPushLoadMoreListener != null) {
                         mLoadMore = true;
                         mOnPushLoadMoreListener.onLoadMore();
+                        if (mFooterViewListener != null) {
+                            mFooterViewListener.start();
+                        }
                     }
                 } else {
                     animatorFooterToBottom((int) overscrollBottom, pushDistance);
@@ -1027,6 +1045,9 @@ public class SuperSwipeRefreshLayout extends ViewGroup {
                     // start loading more
                     mLoadMore = true;
                     mOnPushLoadMoreListener.onLoadMore();
+                    if (mFooterViewListener != null) {
+                        mFooterViewListener.start();
+                    }
                 } else {
                     resetTargetLayout();
                     mLoadMore = false;
@@ -1044,6 +1065,9 @@ public class SuperSwipeRefreshLayout extends ViewGroup {
      */
     public void setLoadMore(boolean loadMore) {
         if (!loadMore && mLoadMore) {// 停止加载
+            if (mFooterViewListener != null) {
+                mFooterViewListener.stop();
+            }
             if (Build.VERSION.SDK_INT < Build.VERSION_CODES.HONEYCOMB) {
                 mLoadMore = false;
                 pushDistance = 0;
@@ -1218,6 +1242,9 @@ public class SuperSwipeRefreshLayout extends ViewGroup {
     private void updatePushDistanceListener() {
         if (mOnPushLoadMoreListener != null) {
             mOnPushLoadMoreListener.onPushDistance(pushDistance);
+            if (mFooterViewListener != null) {
+                mFooterViewListener.onPushDistance(pushDistance);
+            }
         }
     }
 

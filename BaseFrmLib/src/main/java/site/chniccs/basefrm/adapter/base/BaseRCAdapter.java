@@ -4,7 +4,6 @@ import android.support.v7.widget.RecyclerView;
 import android.view.ViewGroup;
 
 import site.chniccs.basefrm.holder.base.BaseRCHolder;
-import site.chniccs.basefrm.listener.ILoadMore;
 import site.chniccs.basefrm.listener.ItemClickListener;
 import site.chniccs.basefrm.listener.ItemLongClickListener;
 
@@ -13,7 +12,6 @@ public abstract class BaseRCAdapter<T>
         extends RecyclerView.Adapter<BaseRCHolder>
 {
     protected T mData;
-    private ILoadMore mILoadMore;
     private ItemClickListener myItemClickListener;
     private ItemLongClickListener myItemLongClickListener;
 
@@ -25,9 +23,7 @@ public abstract class BaseRCAdapter<T>
     {
         setItemData(paramBaseRCHolder, paramInt);
         paramBaseRCHolder.bindViewHolder(paramInt);
-        if ((paramInt == -1 + getItemCount()) && (this.mILoadMore != null)) {
-            this.mILoadMore.loadMore();
-        }
+
     }
 
     public BaseRCHolder onCreateViewHolder(ViewGroup paramViewGroup, int paramInt)
@@ -45,11 +41,6 @@ public abstract class BaseRCAdapter<T>
     public void setData(T paramT)
     {
         this.mData = paramT;
-    }
-
-    public void setILoadMore(ILoadMore paramILoadMore)
-    {
-        this.mILoadMore = paramILoadMore;
     }
 
     protected abstract void setItemData(BaseRCHolder paramBaseRCHolder, int paramInt);

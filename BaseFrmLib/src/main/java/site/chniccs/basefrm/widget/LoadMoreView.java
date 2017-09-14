@@ -10,13 +10,14 @@ import android.widget.LinearLayout;
 import android.widget.TextView;
 
 import site.chniccs.basefrm.R;
+import site.chniccs.basefrm.listener.ILoadMoreViewListener;
 import site.chniccs.basefrm.widget.progress.MaterialProgressDrawable;
 
 /**
  * Created by chniccs on 2017/8/26 14:10.
  */
 
-public class LoadMoreView extends LinearLayout {
+public class LoadMoreView extends LinearLayout implements ILoadMoreViewListener {
 
     private ImageView mLoadingView;
     private MaterialProgressDrawable mMpd;
@@ -66,11 +67,11 @@ public class LoadMoreView extends LinearLayout {
         initSet();
         addView(view);
     }
-
+    @Override
     public void start() {
         mMpd.start();
     }
-
+    @Override
     public void stop() {
         mMpd.stop();
         initSet();
@@ -85,6 +86,4 @@ public class LoadMoreView extends LinearLayout {
         mMpd.setArrowScale(1f); //0~1之间
         mMpd.setProgressRotation(1);
     }
-
-
 }
