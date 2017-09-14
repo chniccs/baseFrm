@@ -19,14 +19,28 @@
         android:orientation="vertical">
 
         <TextView
-            android:id="@+id/dialog_tv_middle"
+            android:id="@+id/tv_title"
             android:layout_width="match_parent"
-            android:layout_height="80dp"
-            android:layout_gravity="center_horizontal"
+            android:layout_height="wrap_content"
             android:layout_marginTop="10dp"
             android:gravity="center"
             android:padding="10dp"
-            android:textSize="18sp"/>
+            android:textColor="@color/common_block"
+            android:textSize="19sp"
+            android:visibility="gone"/>
+
+        <TextView
+            android:id="@+id/dialog_tv_middle"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:layout_gravity="center_horizontal"
+            android:layout_marginTop="10dp"
+            android:gravity="center"
+            android:minLines="2"
+            android:padding="10dp"
+            android:textColor="@color/common_block"
+            android:textSize="16sp"
+            android:visibility="gone"/>
         <!-- 按钮容器 -->
 
         <LinearLayout
@@ -37,24 +51,24 @@
             >
 
             <TextView
-                android:gravity="center"
                 android:id="@+id/common_dialog_btn_left"
                 android:layout_width="0dp"
                 android:layout_height="40dp"
                 android:layout_gravity="center_horizontal"
                 android:layout_weight="1"
                 android:background="@drawable/btn_dialog_left_selector"
+                android:gravity="center"
                 android:textColor="@color/common_block"
                 android:visibility="gone"/>
 
             <TextView
-                android:gravity="center"
                 android:id="@+id/common_dialog_btn_right"
                 android:layout_width="0dp"
                 android:layout_height="40dp"
                 android:layout_gravity="center_horizontal"
                 android:layout_weight="1"
                 android:background="@drawable/btn_dialog_right_selector"
+                android:gravity="center"
                 android:textColor="@android:color/white"
                 android:visibility="gone"/>
         </LinearLayout>

@@ -28,6 +28,7 @@ public class MessageDialog extends BaseDialog {
 
     @Override
     public void init() {
+        TextView mTvTitle = (TextView) mContent.findViewById(R.id.tv_title);
         TextView mTvMessage = (TextView) mContent.findViewById(R.id.dialog_tv_middle);
         TextView mBtnLeft = (TextView) mContent.findViewById(R.id.common_dialog_btn_left);
         TextView mBtnRight = (TextView) mContent.findViewById(R.id.common_dialog_btn_right);
@@ -50,6 +51,12 @@ public class MessageDialog extends BaseDialog {
         } else {
             mTvMessage.setVisibility(View.VISIBLE);
             mTvMessage.setText(mBuilder.getMessage());
+        }
+        if (StringUtils.isEmpty(mBuilder.getTitle())) {
+            mTvTitle.setVisibility(View.GONE);
+        } else {
+            mTvTitle.setVisibility(View.VISIBLE);
+            mTvTitle.setText(mBuilder.getTitle());
         }
 
     }
@@ -82,6 +89,7 @@ public class MessageDialog extends BaseDialog {
 
     public final static class Builder {
         private String message;
+        private String title;
         private String btnLeft;
         private String btnRight;
         private boolean dismissOnClickBtn;
@@ -97,8 +105,16 @@ public class MessageDialog extends BaseDialog {
         }
 
 
-
         public Builder() {
+        }
+
+        public String getTitle() {
+            return title;
+        }
+
+        public Builder setTitle(String title) {
+            this.title = title;
+            return this;
         }
 
         public Builder setMessage(String message) {
