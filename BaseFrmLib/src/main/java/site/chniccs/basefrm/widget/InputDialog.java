@@ -109,7 +109,7 @@ public class InputDialog extends BaseDialog {
                     }
                     inputCallBack.put(key, editText.getText().toString().trim());
                 }
-                if (allRight) {
+                if (!allRight) {
                     return;
                 }
                 mBuilder.getListener().onAgree(inputCallBack);
