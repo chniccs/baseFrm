@@ -9,9 +9,11 @@ import android.os.Handler;
 import android.os.Message;
 import android.support.v4.content.FileProvider;
 import android.text.TextUtils;
+
 import java.io.File;
 import java.io.IOException;
 import java.lang.ref.WeakReference;
+
 import rx.Observable;
 import rx.Subscriber;
 import rx.Subscription;
@@ -200,9 +202,8 @@ public class UpDateUtils implements IOnUpdateDialogClickListener {
         public UpdateHandler(UpdateDialog updateDialog) {
             mUpdateDialogWeakReference = new WeakReference<UpdateDialog>(updateDialog);
         }
-
         @Override
-        public String getMessageName(Message message) {
+        public void handleMessage(Message message) {
 
             switch (message.what) {
                 case UPDATE:
@@ -233,7 +234,7 @@ public class UpDateUtils implements IOnUpdateDialogClickListener {
                     }
                     break;
             }
-            return super.getMessageName(message);
+            super.handleMessage(message);
         }
     }
 
