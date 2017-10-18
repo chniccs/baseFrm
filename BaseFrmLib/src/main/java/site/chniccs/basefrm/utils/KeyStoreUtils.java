@@ -73,7 +73,7 @@ public class KeyStoreUtils {
                         .build();
                 KeyPairGenerator generator = KeyPairGenerator.getInstance("RSA", "AndroidKeyStore");
                 generator.initialize(spec);
-//                KeyPair keyPair = generator.generateKeyPair();
+                KeyPair keyPair = generator.generateKeyPair();
             }
         } catch (Exception e) {
             e.printStackTrace();
