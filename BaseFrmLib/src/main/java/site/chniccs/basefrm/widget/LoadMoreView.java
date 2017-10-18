@@ -76,6 +76,17 @@ public class LoadMoreView extends LinearLayout implements ILoadMoreViewListener 
         mMpd.stop();
         initSet();
     }
+
+    @Override
+    public void onPushDistance(int pushDistance) {
+
+    }
+
+    @Override
+    public void onPushEnable(boolean enable) {
+
+    }
+
     private void initSet(){
         mMpd.setBackgroundColor(CIRCLE_BG_LIGHT);
         mMpd.setColorSchemeColors(colors);
