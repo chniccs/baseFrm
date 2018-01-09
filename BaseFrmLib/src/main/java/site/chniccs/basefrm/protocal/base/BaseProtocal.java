@@ -21,8 +21,6 @@ public abstract class BaseProtocal<T> {
     private static OkHttpClient okHttpClient;
     private static OkHttpClient mCookiesClient;
     private static CallAdapter.Factory rxJavaCallAdapterFactory = RxJavaCallAdapterFactory.create();
-    private static BaseInterceptor mInterceptor;
-    private static BaseInterceptor mCookieInterceptor;
     private T api;
     private T apiWithCookies;
 
@@ -45,21 +43,19 @@ public abstract class BaseProtocal<T> {
     abstract String getBaseUrl();
 
     //设置拦截器
-    public static void setInterceptor(BaseInterceptor interceptor) {
-        mInterceptor = interceptor;
+    public BaseInterceptor  getInterceptor() {
+        return  null;
     }
 
-    public static void setCookieInterceptor(BaseInterceptor interceptor) {
-        mCookieInterceptor = interceptor;
-    }
+
 
     public T getApi() {
         if (this.api == null) {
 //            添加通用拦截器，用于添加参数
             if (okHttpClient == null) {
                 OkHttpClient.Builder builder = new OkHttpClient.Builder();
-                if (mInterceptor != null) {
-                    builder.addInterceptor(mInterceptor);
+                if (getInterceptor() != null) {
+                    builder.addInterceptor(getInterceptor());
                 }
                 okHttpClient = builder
                         .connectTimeout(TIME_OUT, TimeUnit.MILLISECONDS)
@@ -88,8 +84,8 @@ public abstract class BaseProtocal<T> {
         if (this.apiWithCookies == null) {
             if (mCookiesClient == null) {
                 OkHttpClient.Builder builder = new OkHttpClient.Builder();
-                if (mCookieInterceptor != null) {
-                    builder.addInterceptor(mCookieInterceptor);
+                if (getInterceptor() != null) {
+                    builder.addInterceptor(getInterceptor());
                 }
                 mCookiesClient = builder
                         .connectTimeout(TIME_OUT, TimeUnit.MILLISECONDS)
