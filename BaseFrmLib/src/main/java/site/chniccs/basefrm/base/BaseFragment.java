@@ -2,7 +2,6 @@ package site.chniccs.basefrm.base;
 
 import android.os.Bundle;
 import android.support.annotation.LayoutRes;
-import android.support.annotation.NonNull;
 import android.support.annotation.Nullable;
 import android.support.v4.app.Fragment;
 import android.view.LayoutInflater;
@@ -70,7 +69,7 @@ public abstract class BaseFragment<T extends IBasePresenter> extends Fragment im
     private T createPresenter() {
         T presenterInstance = null;
         try {
-            Class<T> presenter = getPresenter();
+            Class<T> presenter = (Class<T>) getPresenter();
             Constructor c = presenter.getDeclaredConstructor(new Class[]{IBaseView.class});
             c.setAccessible(true);
             presenterInstance = (T) c.newInstance(new Object[]{this});
@@ -87,7 +86,7 @@ public abstract class BaseFragment<T extends IBasePresenter> extends Fragment im
     @LayoutRes
     int getLayout();
 
-    protected abstract Class<T> getPresenter();
+    protected abstract Class<?> getPresenter();
 
     @Override
     public void shodLoading() {
