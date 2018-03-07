@@ -14,6 +14,7 @@ import java.security.KeyStore;
 import java.security.KeyStoreException;
 import java.security.PrivateKey;
 import java.security.PublicKey;
+import java.security.UnrecoverableKeyException;
 import java.util.ArrayList;
 import java.util.Calendar;
 
@@ -167,6 +168,13 @@ public class KeyStoreUtils {
                 bytes[i] = values.get(i).byteValue();
             }
             return new String(bytes, 0, bytes.length, "UTF-8");
+        }catch (UnrecoverableKeyException e) {
+            e.printStackTrace();
+
+            deleteKey(alias);
+            createKey(alias, context);
+            return decryptString(alias,content,context);
+
         } catch (Exception e) {
             e.printStackTrace();
             ToastUtil.show(context, "解密失败");
